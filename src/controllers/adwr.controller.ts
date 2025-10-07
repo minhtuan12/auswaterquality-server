@@ -30,7 +30,7 @@ class ADWRController {
     const { year = 2008, state = 'All', community = 'All', locationType = 'All', progress = 'all' } = req.query
     try {
       const result = await AdwrService.getGisMapData({ year, state, community, locationType })
-      const dataProgress = await this.communityService.getCommunitiesWithProgress(progress);
+      const dataProgress = await this.communityService.getCommunitiesWithProgress({progress, state, community, locationType});
       return ResponseHelper.success(res, {adwg: result, progress: dataProgress}, 'GIS Map retrieved successfully')
     } catch (error: any) {
       const err = error as { message: string; status?: number }
