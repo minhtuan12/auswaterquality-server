@@ -20,18 +20,27 @@ import { authMiddleware } from './middlewares/auth.middleware'
 import ResponseHelper from './utils/response.helper'
 import { HttpStatusCode } from './enums/httpCode.enum'
 import { NodeMailerHelper } from './utils/nodemailer.helper'
-import { ADWRModel, NewsModel } from './models'
 import ParameterModel from './models/parameter.model'
 
 const app = express()
 const LOCAL_PORT = process.env.LOCAL_PORT
 const PORT = process.env.PORT
 const mongoURI = process.env.MONGO_URI ?? ''
+let isConnectedDb;
 
-mongoose
-  .connect(mongoURI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err))
+if (!isConnectedDb) {
+  async function connectDb() {
+    try {
+      const db = await mongoose
+        .connect(mongoURI, { bufferCommands: false, serverSelectionTimeoutMS: 20000 });
+      isConnectedDb = db.connections[0].readyState;
+      console.log("✅ MongoDB connected");
+    } catch (error) {
+      console.log("❌ MongoDB error:", error);
+    }
+  }
+  connectDb();
+}
 
 const corsOptions = {
   origin: true,
